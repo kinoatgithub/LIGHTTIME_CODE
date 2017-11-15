@@ -6,11 +6,8 @@
 #define EX_FOSC         32768
 #define CLOCK_DIVISION	960
 
-
-bit COUNT_OVERFLOWDE;
-
 extern bit TIMER2_INTERRUPT_FLAG;
 
-RETURN_STATUS TIME_COUNT_INIT( void );
+void TIME_COUNT_INIT( void );
 
 #endif

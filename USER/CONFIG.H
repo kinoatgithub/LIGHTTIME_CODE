@@ -7,6 +7,7 @@
 #define DELAY_INITIAL_VALUE					10000			//加速旋转时首次延时时间
 #define SWITCH_DISCHARGE_PERIOD				80				//设置按键扫描时电容放电持续时间，定性，多减少加。
 #define	SWITCH_CHARGE_PERIOD				20				//设置按键扫描时电容充电持续时间，定性，多减少加。
+#define SWITCH_HYSTERESIS_VAL               4               //方向回滞，重复确认次数以减少误触发
 
 
 #endif

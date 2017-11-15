@@ -2,7 +2,7 @@
 
 sbit	switch_pin  =  P3^1;
 
-RETURN_STATUS SWITCH_INIT( void )
+void SWITCH_INIT( void )
 {
 	P3M0 |= 0x02 ;											//P3.1设置为开漏输出
 	P3M1 |= 0x02 ;
@@ -49,7 +49,7 @@ DIRECTION_TYPE SCAN_SWITCH( void )
 	}
 	if( SWITCH_HYSTERESIS_VAL < direction_hysteresis )
 	{
-		SWITCH_HYSTERESIS_VAL = direction_hysteresis;
+		direction_hysteresis = SWITCH_HYSTERESIS_VAL;
 		public_direction = now_direction;
 	}
 	return public_direction;
