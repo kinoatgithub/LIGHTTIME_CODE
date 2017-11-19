@@ -12,9 +12,6 @@
 #define RSE_MARK	0
 #define SET_MARK	1
 
-#define POS_ROTATE( x ) ((( x ) >> 1 ) | (( x ) << 3 ))
-#define NEG_ROTATE( x ) ((( x ) << 1 ) | (( x ) >> 3 ))
-
 typedef enum
 {
 	ERROR = 0	,

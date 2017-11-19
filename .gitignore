@@ -5,3 +5,5 @@
 *.obj
 *.__i
 *.htm
+*.map
+*.sbr
