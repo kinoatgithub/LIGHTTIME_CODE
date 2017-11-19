@@ -13,9 +13,7 @@ void DEBUG_LED( void )
 
 u8 POS_ROTATE( u8 x )
 {
-	u8 i = x;
-	i = i >> 1;
-	return i;
+	return ((( x ) >> 1 ) | (( x ) << 3 ));
 }
 
 u8 NEG_ROTATE( u8 x )
@@ -23,20 +21,7 @@ u8 NEG_ROTATE( u8 x )
 	return ((( x ) << 1 ) | (( x ) >> 3 ));
 }
 
-void MOTO_DRIVER_INIT( void )
-{
-	moto_phase[ 0 ] = 0x11;
-	TIME_COUNT_INIT();
-//	SWITCH_INIT();
-	P3M0 |= 0x0C;									//P3.2 & P3.3必须设置为推挽输出
-	P5M0 |= 0x30;									//P5.4 & P5.5必须设置为推挽输出
-	PHASE_A = 0;
-	PHASE_B = 0;
-	PHASE_C	= 0;
-	PHASE_D = 0;
-}
-
-void SET( u8 phase )
+void SET_PHASE( u8 phase )
 {
 	PHASE_A = phase & 0x08;
 	PHASE_B = phase & 0x04;
@@ -44,16 +29,35 @@ void SET( u8 phase )
 	PHASE_D = phase & 0x01;
 }
 
+void MOTO_DRIVER_INIT( void )
+{
+	moto_phase[ 0 ] = 0x11;
+	TIME_COUNT_INIT();
+	SWITCH_INIT();
+	P3M0 |= 0x0C;									//P3.2 & P3.3必须设置为推挽输出
+	P5M0 |= 0x30;									//P5.4 & P5.5必须设置为推挽输出
+	SET_PHASE( 0 );
+}
+
 u16 hard_delay( u16 delay_time )
 {
-	u8 i, j;
+	u16 i, j;
 	u16 next_time;
+//	static u16 time_tail;
 	for( i = 0 ; 0 < ( delay_time - i ) ; i++ )
 	{
 		j = DELAY_UNIT;
 		do
 		{
-			next_time = (( delay_time * ANGULAR_ACCELERATION_RATE ) / ANTI_JAGGIES );
+//			next_time = (( delay_time * ANGULAR_ACCELERATION_RATE ) / ANTI_JAGGIES );
+//			time_tail = (( delay_time * ANGULAR_ACCELERATION_RATE + time_tail ) % ANTI_JAGGIES );
+//			if( next_time < MIN_DELAY_TIME )
+//				next_time = MIN_DELAY_TIME;
+			
+//			next_time = (( delay_time * ANGULAR_ACCELERATION_RATE + time_tail ) / ANTI_JAGGIES );
+//			time_tail = (( delay_time * ANGULAR_ACCELERATION_RATE + time_tail ) % ANTI_JAGGIES );
+//			if( next_time < MIN_DELAY_TIME )
+//				next_time = MIN_DELAY_TIME;
 		}
 		while( j-- );
 	}
@@ -62,91 +66,50 @@ u16 hard_delay( u16 delay_time )
 
 void MOTO_CONTROL( void )
 {
-//	static bit step;
-//	static u16 next_times;
-//	DIRECTION_TYPE now_direction;
-//	static DIRECTION_TYPE last_direction;
-//	if( TF0 != RSE_MARK )
-//	{
-//		now_direction = SCAN_SWITCH();
-//		if( last_direction != now_direction )
-//		{
-//			moto_phase[ 1 ] = moto_phase[ 0 ];
-//			next_times = DELAY_INITIAL_VALUE;
-//			last_direction = now_direction;
-//		}
-//		TL0 = 0x00;				//设置定时初值
-//		TH0 = 0x00;				//设置定时初值
-//		TF0 = RSE_MARK;			//清除TF0标志
-//																		//DEBUG_LED();
-//	}
-//	if( last_direction != NON )
-//	{
-//		if( last_direction == POS )
-//			moto_phase[ step ] = POS_ROTATE( moto_phase[ step ] );
-//		else
-//			moto_phase[ step ] = NEG_ROTATE( moto_phase[ step ] );
-//		step = ~step;
-//		SET_PHASE( moto_phase[ 0 ] | moto_phase[ 1 ] );
-//		next_times = hard_delay( next_times );
-//	}
-//	else
-//	{
-//		SET_PHASE( 0 );
-//		if( TIMER2_INTERRUPT_FLAG == SET_MARK )
-//		{
-//			SET_PHASE( moto_phase[ 0 ] );
-//			moto_phase[ 0 ] = POS_ROTATE( moto_phase[ 0 ] );
-//			TIMER2_INTERRUPT_FLAG = RSE_MARK;
-//			hard_delay( ONE_PULSE_WIDTH );
-//			if( ( moto_phase[ 0 ] & 0x01 ) == SET_MARK )
-//			{
-//				moto_phase[ 0 ] = 0x11;
-//			}
-//		}
-//	}
-	while( 1 )
+	static bit step;
+	static u16 next_times = 600;
+	DIRECTION_TYPE now_direction;
+	static DIRECTION_TYPE last_direction;
+	if( TF0 != RSE_MARK )
 	{
-		u16 i,j,k;
-		u8 bug_reg;
-		k=100;
-		bug_reg = 0x01;
-		SET( bug_reg );
-		i=k;
-		while(i--)
+		now_direction = SCAN_SWITCH();
+		if( last_direction != now_direction )
 		{
-			j=k;
-			while(j--);
+			moto_phase[ 1 ] = moto_phase[ 0 ];
+			next_times = DELAY_INITIAL_VALUE;
+			last_direction = now_direction;
 		}
-		
-
-		SET( bug_reg<<1 );
-		i=k;
-		while(i--)
-		{
-			j=k;
-			while(j--);
-		}
-		
-		SET( bug_reg<<2 );
-		i=k;
-		while(i--)
-		{
-			j=k;
-			while(j--);
-		}
-		
-		SET( 0x08 );
-		i=k;
-		while(i--)
-		{
-			j=k;
-			while(j--);
-		}
+		TL0 = 0x00;				//设置定时初值
+		TH0 = 0x00;				//设置定时初值
+		TF0 = RSE_MARK;			//清除TF0标志
+																		DEBUG_LED();
 	}
-	
-	
-	
+	if( last_direction != NON )
+	{
+		if( last_direction == POS )
+			moto_phase[ step ] = POS_ROTATE( moto_phase[ step ] );
+		else
+			moto_phase[ step ] = NEG_ROTATE( moto_phase[ step ] );
+		step = ~step;
+		SET_PHASE( moto_phase[ 0 ] | moto_phase[ 1 ] );
+		next_times = hard_delay( next_times );
+	}
+	else
+
+	{
+		if( TIMER2_INTERRUPT_FLAG == SET_MARK )
+		{
+			SET_PHASE( moto_phase[ 0 ] );
+			moto_phase[ 0 ] = POS_ROTATE( moto_phase[ 0 ] );
+			TIMER2_INTERRUPT_FLAG = RSE_MARK;
+			hard_delay( ONE_PULSE_WIDTH );
+			SET_PHASE( 0 );
+			if( ( moto_phase[ 0 ] & 0x10 ) == SET_MARK )
+			{
+				moto_phase[ 0 ] = 0x11;
+			}
+		}
+	}	
 }
 
 

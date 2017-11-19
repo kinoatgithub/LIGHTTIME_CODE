@@ -22,7 +22,7 @@ void Timer0Init(void)
 
 void TIME_COUNT_INIT( void )
 {
-//	Timer0Init();
+	Timer0Init();
     T2L = 0x00;
 	T2H = 0x1F;
 	AUXR |= 0x18;												//定时器2设为计数器，计数输入设为不分频，并允许T2开始运行
