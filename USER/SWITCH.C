@@ -1,11 +1,11 @@
 #include "SWITCH.H"
 
-sbit	switch_pin  =  P3^1;
+sbit	switch_pin  =  P3^0;
 
 void SWITCH_INIT( void )
 {
-	P3M0 |= 0x02 ;											//P3.1设置为开漏输出
-	P3M1 |= 0x02 ;
+	P3M0 |= 0x01 ;											//P3.0设置为开漏输出
+	P3M1 |= 0x01 ;
 }
 
 DIRECTION_TYPE SCAN_SWITCH( void )

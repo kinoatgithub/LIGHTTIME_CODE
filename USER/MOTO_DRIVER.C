@@ -39,35 +39,32 @@ void MOTO_DRIVER_INIT( void )
 	SET_PHASE( 0 );
 }
 
-u16 hard_delay( u16 delay_time )
+u16 hard_delay( u16 freq )
 {
-	u16 i, j;
-	u16 next_time;
-//	static u16 time_tail;
-	for( i = 0 ; 0 < ( delay_time - i ) ; i++ )
+	static u16 j;
+	u16 i , return_freq = freq;
+	u16 t = ANTI_JAGGIES / freq;
+	for( i = 0 ; i < t ; i++ )
 	{
-		j = DELAY_UNIT;
-		do
+		if( j < ANGULAR_ACCELERATION )
 		{
-//			next_time = (( delay_time * ANGULAR_ACCELERATION_RATE ) / ANTI_JAGGIES );
-//			time_tail = (( delay_time * ANGULAR_ACCELERATION_RATE + time_tail ) % ANTI_JAGGIES );
-//			if( next_time < MIN_DELAY_TIME )
-//				next_time = MIN_DELAY_TIME;
-			
-//			next_time = (( delay_time * ANGULAR_ACCELERATION_RATE + time_tail ) / ANTI_JAGGIES );
-//			time_tail = (( delay_time * ANGULAR_ACCELERATION_RATE + time_tail ) % ANTI_JAGGIES );
-//			if( next_time < MIN_DELAY_TIME )
-//				next_time = MIN_DELAY_TIME;
+			j++;
 		}
-		while( j-- );
+		else
+		{
+			j = 0;
+			return_freq++;
+			if( FREQ_LIMIT < return_freq )
+				return_freq = FREQ_LIMIT;
+		}
 	}
-	return next_time;
+	return return_freq;
 }
 
 void MOTO_CONTROL( void )
 {
 	static bit step;
-	static u16 next_times = 600;
+	static u16 next_freq;
 	DIRECTION_TYPE now_direction;
 	static DIRECTION_TYPE last_direction;
 	if( TF0 != RSE_MARK )
@@ -76,33 +73,35 @@ void MOTO_CONTROL( void )
 		if( last_direction != now_direction )
 		{
 			moto_phase[ 1 ] = moto_phase[ 0 ];
-			next_times = DELAY_INITIAL_VALUE;
+			next_freq = DELAY_INITIAL_VALUE;
 			last_direction = now_direction;
 		}
 		TL0 = 0x00;				//设置定时初值
 		TH0 = 0x00;				//设置定时初值
-		TF0 = RSE_MARK;			//清除TF0标志
-																		DEBUG_LED();
+		TF0 = RSE_MARK;			//清除TF0标志														
 	}
 	if( last_direction != NON )
 	{
 		if( last_direction == POS )
+		{
 			moto_phase[ step ] = POS_ROTATE( moto_phase[ step ] );
+		}
 		else
+		{
 			moto_phase[ step ] = NEG_ROTATE( moto_phase[ step ] );
+		}
 		step = ~step;
 		SET_PHASE( moto_phase[ 0 ] | moto_phase[ 1 ] );
-		next_times = hard_delay( next_times );
+		next_freq = hard_delay( next_freq );
 	}
 	else
-
 	{
 		if( TIMER2_INTERRUPT_FLAG == SET_MARK )
 		{
 			SET_PHASE( moto_phase[ 0 ] );
 			moto_phase[ 0 ] = POS_ROTATE( moto_phase[ 0 ] );
 			TIMER2_INTERRUPT_FLAG = RSE_MARK;
-			hard_delay( ONE_PULSE_WIDTH );
+			hard_delay( ONE_PULSE_FREQ );
 			SET_PHASE( 0 );
 			if( ( moto_phase[ 0 ] & 0x10 ) == SET_MARK )
 			{

@@ -3,6 +3,7 @@
 #include "SWITCH.H"
 
 DIRECTION_TYPE LAST_DERECTION;
+
 void USER_SYS_INIT( void )
 {
     MOTO_DRIVER_INIT();
