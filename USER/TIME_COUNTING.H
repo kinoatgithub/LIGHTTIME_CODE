@@ -6,8 +6,7 @@
 #define EX_FOSC         32768
 #define CLOCK_DIVISION	960
 
-extern bit TIMER2_INTERRUPT_FLAG;
-
 void TIME_COUNT_INIT( void );
+void SOFT_DELAY( u16 times );
 
 #endif

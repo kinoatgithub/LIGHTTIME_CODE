@@ -1,58 +1,72 @@
 #include "SWITCH.H"
+#include "TIME_COUNTING.H"
 
+#define direction_group_hysteresis_num ( 0x01 << DIRECTION_HYSTERESIS_BIT_SIZE )
+#define direction_group_hysteresis_mark ( direction_group_hysteresis_num - 1 )
+
+extern u16 GTR;
+extern u16 SWITCH_SCAN_DELAY;
+DIRECTION_TYPE PUBLIC_DIRECTION;
 sbit	switch_pin  =  P3^0;
+
 
 void SWITCH_INIT( void )
 {
-	P3M0 |= 0x01 ;											//P3.0设置为开漏输出
+	P3M0 |= 0x01 ;																	//P3.0设置为开漏输出
 	P3M1 |= 0x01 ;
 }
 
-DIRECTION_TYPE SCAN_SWITCH( void )
+void SCAN_SWITCH( void )
 {
-	u8 i ;
-	bit befor_pull , after_pull;
-	DIRECTION_TYPE now_direction;
-	static u8 direction_hysteresis;
-	static DIRECTION_TYPE last_direction , public_direction;
+	static hysteresis_group_ptr;
+	bit befor_pull , after_pull , hysteresis_status = 0;
+	DIRECTION_TYPE hysteresis_group[ direction_group_hysteresis_num ];
+	
+	if( SWITCH_SCAN_DELAY < SWITCH_SCAN_PERIOD )
+	{
+		return;
+	}
+	SWITCH_SCAN_DELAY = 0;
 	befor_pull = switch_pin;
 	switch_pin = RSE_MARK;
-	i = SWITCH_DISCHARGE_PERIOD;
-	while( i-- );
+	GTR = SWITCH_DISCHARGE_PERIOD;
+	while( GTR-- );
 	switch_pin = SET_MARK;
-	i = SWITCH_CHARGE_PERIOD;
-	while( i-- );
+	GTR = SWITCH_CHARGE_PERIOD;
+	while( GTR-- );
 	after_pull = switch_pin;
+	hysteresis_group_ptr++;
+	hysteresis_group_ptr &= ( direction_group_hysteresis_mark );
 	if( after_pull != SET_MARK )
 	{
-		if( befor_pull != SET_MARK )																																									//检测到没串电容的按钮接通
+		if( befor_pull != SET_MARK )												//检测到没串电容的按钮接通
 		{
-			now_direction = POS;
+			hysteresis_group[ hysteresis_group_ptr ] = POS;
 		}
 		else
 		{
-			now_direction = NEG;																																										//检测到有串电容的按钮接通
+			hysteresis_group[ hysteresis_group_ptr ] = NEG;							//检测到有串电容的按钮接通
 		}
 	}
 	else
 	{
-		now_direction = NON;
+		hysteresis_group[ hysteresis_group_ptr ] = NON;
 	}
-	if( last_direction != now_direction )
+	for( GTR = 0 ; GTR < direction_group_hysteresis_mark ; GTR++ )
 	{
-		last_direction = now_direction;
-		direction_hysteresis = 0;
+		if( hysteresis_group[ GTR ] != hysteresis_group[ GTR + 1 ] )
+		{
+			hysteresis_status = SET_MARK;
+		}
+	}
+	if( hysteresis_status )															//按键是否不稳定
+	{
+		PUBLIC_DIRECTION = PUBLIC_DIRECTION;
 	}
 	else
 	{
-		direction_hysteresis++;
+		PUBLIC_DIRECTION = hysteresis_group[ 0 ];
 	}
-	if( SWITCH_HYSTERESIS_VAL < direction_hysteresis )
-	{
-		direction_hysteresis = SWITCH_HYSTERESIS_VAL;
-		public_direction = now_direction;
-	}
-	return public_direction;
 }
 
 

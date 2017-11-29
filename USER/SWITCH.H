@@ -3,6 +3,6 @@
 #include "INCLUDE.H"
 
 void SWITCH_INIT( void );
-DIRECTION_TYPE SCAN_SWITCH( void );
+void SCAN_SWITCH( void );
 
 #endif
