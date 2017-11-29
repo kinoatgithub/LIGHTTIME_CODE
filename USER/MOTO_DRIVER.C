@@ -9,10 +9,10 @@ extern DIRECTION_TYPE PUBLIC_DIRECTION;
 extern bit ONE_PULSE_TIMESUP_FLAG;
 extern u16 ONE_PULSE_DELAY , ACCELERATION_DELAY;
 
-//void DEBUG_LED( void )
-//{
-//	PHASE_D = ~PHASE_D;
-//}
+void DEBUG_LED( void )
+{
+	PHASE_D = ~PHASE_D;
+}
 
 u8 POS_ROTATE( u8 x )
 {
@@ -86,6 +86,7 @@ void ANGULAR_ACCELERATING_CHECK( void )
 			freq++;
 		}
 		SCAN_SWITCH();
+		DEBUG_LED();//debug@kino
 	}
 }
 

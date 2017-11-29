@@ -11,6 +11,6 @@ sbit	PHASE_D	=	P3^2;
 void MOTO_DRIVER_INIT( void );
 void ONE_PULSE_DRIVING_CHECK( void );
 void ANGULAR_ACCELERATING_CHECK( void );
-//void DEBUG_LED( void );
+void DEBUG_LED( void );
 
 #endif																	//__MOTO_DRIVER_H_

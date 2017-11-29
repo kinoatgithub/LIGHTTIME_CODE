@@ -1,6 +1,7 @@
 #ifndef __CONFIG_H_
 #define __CONFIG_H_
 
+#define CLOCK_DIVISION						10000					//时钟分频
 #define ONE_PULSE_WIDTH						100					//单脉冲走时模式，脉冲持续时间,定性，多减少加。
 #define SOFT_DELAY_UNIT						10					//最小软延时单元
 #define DIRECTION_HYSTERESIS_BIT_SIZE		2           	    //方向回滞状态存储位数，重复确认次数以减少误触发,~表示有2^~个历史记录;
