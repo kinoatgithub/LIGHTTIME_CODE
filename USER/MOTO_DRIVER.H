@@ -3,11 +3,6 @@
 
 #include "INCLUDE.H"
 
-sbit 	PHASE_A	=	P5^4;
-sbit 	PHASE_B	=	P5^5;
-sbit 	PHASE_C	=	P3^3;
-sbit	PHASE_D	=	P3^2;
-
 void MOTO_DRIVER_INIT( void );
 void ONE_PULSE_DRIVING_CHECK( void );
 void ANGULAR_ACCELERATING_CHECK( void );

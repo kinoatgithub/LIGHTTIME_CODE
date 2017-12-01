@@ -7,13 +7,13 @@
 extern u16 GTR;
 extern u16 SWITCH_SCAN_DELAY;
 DIRECTION_TYPE PUBLIC_DIRECTION;
-sbit	switch_pin  =  P3^0;
+sbit	switch_pin  =  P3^5;
 
 
 void SWITCH_INIT( void )
 {
-	P3M0 |= 0x01 ;																	//P3.0设置为开漏输出
-	P3M1 |= 0x01 ;
+	P3M0 |= 0x20 ;																	//P3.5设置为开漏输出
+	P3M1 |= 0x20 ;
 }
 
 void SCAN_SWITCH( void )

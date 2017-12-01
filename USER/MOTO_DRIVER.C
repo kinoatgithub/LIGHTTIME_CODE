@@ -2,6 +2,9 @@
 #include "TIME_COUNTING.H"
 #include "SWITCH.H"
 
+#define POS_ROTATE( x ) ((( x ) >> 1 ) | (( x ) << 3 ))
+#define NEG_ROTATE( x ) ((( x ) << 1 ) | (( x ) >> 3 ))
+
 u16 GTR;
 static u8 next_delay_times;
 static u8 moto_phase[2];
@@ -11,22 +14,12 @@ extern u16 ONE_PULSE_DELAY , ACCELERATION_DELAY;
 
 void DEBUG_LED( void )
 {
-	PHASE_D = ~PHASE_D;
-}
-
-u8 POS_ROTATE( u8 x )
-{
-	return ((( x ) >> 1 ) | (( x ) << 3 ));
-}
-
-u8 NEG_ROTATE( u8 x )
-{
-	return ((( x ) << 1 ) | (( x ) >> 3 ));
+	P30 = ~P30;
 }
 
 void SET_PHASE( u8 phase )
 {
-	P3 &= 0xF0;
+	P3 &= ( P3 & ( phase | 0xF0 ) | 0x20 );
 	P3 |= phase & 0x0F;
 }
 
@@ -71,22 +64,23 @@ void ANGULAR_ACCELERATING_CHECK( void )
 {
 	static u8 freq;
 	static DIRECTION_TYPE last_direction;
+	SCAN_SWITCH();
 	while( PUBLIC_DIRECTION != NON )
 	{
 		if( last_direction != PUBLIC_DIRECTION )
 		{
-			last_direction = PUBLIC_DIRECTION;
 			freq = DELAY_FREQ_INITIAL_VALUE;
 		}
+		last_direction = PUBLIC_DIRECTION;
 		accelerating_driver( last_direction );
 		if( ACCELERAT_PERIOD < ACCELERATION_DELAY )
 		{
 			ACCELERATION_DELAY = 0;
-			next_delay_times = ANTI_JAGGIES / freq;				//试一下自加的代码量变化
-			freq++;
+			next_delay_times = ANTI_JAGGIES / freq;
+			if( ACCELERATION_MAX_FREQ < freq++ )
+				freq = ACCELERATION_MAX_FREQ;
 		}
 		SCAN_SWITCH();
-		DEBUG_LED();//debug@kino
 	}
 }
 
