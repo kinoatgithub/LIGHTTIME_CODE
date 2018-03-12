@@ -28,8 +28,8 @@ void MOTO_DRIVER_INIT( void )
 	moto_phase[ 0 ] = 0x11;
 	TIME_COUNT_INIT();
 	SWITCH_INIT();
+	SET_PHASE( 0 );	
 	P3M0 |= 0x0F;									//驱动达林顿管必须设置P3.0 ~ P3.3为推挽输出
-	SET_PHASE( 0 );
 }
 
 void ONE_PULSE_DRIVING_CHECK( void )
@@ -67,12 +67,14 @@ void ANGULAR_ACCELERATING_CHECK( void )
 	SCAN_SWITCH();
 	while( PUBLIC_DIRECTION != NON )
 	{
+		SCAN_SWITCH();
 		if( last_direction != PUBLIC_DIRECTION )
 		{
+			moto_phase[ 1 ] = moto_phase[ 0 ];
 			freq = DELAY_FREQ_INITIAL_VALUE;
+			last_direction = PUBLIC_DIRECTION;
 		}
-		last_direction = PUBLIC_DIRECTION;
-		accelerating_driver( last_direction );
+		accelerating_driver( PUBLIC_DIRECTION );
 		if( ACCELERAT_PERIOD < ACCELERATION_DELAY )
 		{
 			ACCELERATION_DELAY = 0;
@@ -80,7 +82,6 @@ void ANGULAR_ACCELERATING_CHECK( void )
 			if( ACCELERATION_MAX_FREQ < freq++ )
 				freq = ACCELERATION_MAX_FREQ;
 		}
-		SCAN_SWITCH();
 	}
 }
 

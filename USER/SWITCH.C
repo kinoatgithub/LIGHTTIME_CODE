@@ -18,8 +18,8 @@ void SWITCH_INIT( void )
 
 void SCAN_SWITCH( void )
 {
-	static hysteresis_group_ptr;
-	bit befor_pull , after_pull , hysteresis_status = 0;
+	static u8 hysteresis_group_ptr;
+	bit befor_pull , after_pull;
 	DIRECTION_TYPE hysteresis_group[ direction_group_hysteresis_num ];
 	
 	if( SWITCH_SCAN_DELAY < SWITCH_SCAN_PERIOD )
@@ -56,17 +56,10 @@ void SCAN_SWITCH( void )
 	{
 		if( hysteresis_group[ GTR ] != hysteresis_group[ GTR + 1 ] )
 		{
-			hysteresis_status = SET_MARK;
+			return;
 		}
 	}
-	if( hysteresis_status )															//按键是否不稳定
-	{
-		PUBLIC_DIRECTION = PUBLIC_DIRECTION;
-	}
-	else
-	{
-		PUBLIC_DIRECTION = hysteresis_group[ 0 ];
-	}
+	PUBLIC_DIRECTION = hysteresis_group[ 0 ];
 }
 
 
