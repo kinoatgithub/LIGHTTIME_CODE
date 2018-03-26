@@ -2,20 +2,20 @@
 #include "TIME_COUNTING.H"
 #include "SWITCH.H"
 
-#define POS_ROTATE( x ) ((( x ) >> 1 ) | (( x ) << 3 ))
-#define NEG_ROTATE( x ) ((( x ) << 1 ) | (( x ) >> 3 ))
+#define POS_ROTATE( x ) ((( x ) << 1 ) | (( x ) >> 3 ))
+#define NEG_ROTATE( x ) ((( x ) >> 1 ) | (( x ) << 3 ))
 
-u16 GTR;
+u16 GTR;											//global temp register
 static u8 next_delay_times;
 static u8 moto_phase[2];
 extern DIRECTION_TYPE PUBLIC_DIRECTION;
 extern bit ONE_PULSE_TIMESUP_FLAG;
 extern u16 ONE_PULSE_DELAY , ACCELERATION_DELAY;
 
-void DEBUG_LED( void )
-{
-	P30 = ~P30;
-}
+//void DEBUG_LED( void )
+//{
+//	P30 = ~P30;
+//}
 
 void SET_PHASE( u8 phase )
 {
@@ -30,6 +30,7 @@ void MOTO_DRIVER_INIT( void )
 	SWITCH_INIT();
 	SET_PHASE( 0 );	
 	P3M0 |= 0x0F;									//驱动达林顿管必须设置P3.0 ~ P3.3为推挽输出
+	while( switch_pin == SET_MARK );				//当检测到按键后才允许启动系统
 }
 
 void ONE_PULSE_DRIVING_CHECK( void )

@@ -7,7 +7,6 @@
 extern u16 GTR;
 extern u16 SWITCH_SCAN_DELAY;
 DIRECTION_TYPE PUBLIC_DIRECTION;
-sbit	switch_pin  =  P3^5;
 
 
 void SWITCH_INIT( void )
