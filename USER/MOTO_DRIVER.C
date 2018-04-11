@@ -2,10 +2,15 @@
 #include "TIME_COUNTING.H"
 #include "SWITCH.H"
 
+//#define POS_ROTATE( x ) ((( x ) >> 1 ) | (( x ) << 3 ))
+//#define NEG_ROTATE( x ) ((( x ) << 1 ) | (( x ) >> 3 ))
+
 #define POS_ROTATE( x ) ((( x ) << 1 ) | (( x ) >> 3 ))
-#define NEG_ROTATE( x ) ((( x ) >> 1 ) | (( x ) << 3 ))
+#define NEG_ROTATE( x )	((( x ) >> 1 ) | (( x ) << 3 ))
 
 u16 GTR;											//global temp register
+u16 PC;
+bit dir;
 static u8 next_delay_times;
 static u8 moto_phase[2];
 extern DIRECTION_TYPE PUBLIC_DIRECTION;
@@ -38,53 +43,61 @@ void ONE_PULSE_DRIVING_CHECK( void )
 	if( ONE_PULSE_TIMESUP_FLAG )
 	{
 		ONE_PULSE_TIMESUP_FLAG = RSE_MARK;
-		moto_phase[ 0 ] = POS_ROTATE( moto_phase[ 0 ] );
+		if( dir )
+		{
+			moto_phase[ 0 ] = POS_ROTATE( moto_phase[ 0 ] );
+		}
+		else
+		{
+			moto_phase[ 0 ] = NEG_ROTATE( moto_phase[ 0 ] );
+		}
 		SET_PHASE( moto_phase[ 0 ] );
 		SOFT_DELAY( ONE_PULSE_WIDTH );
 		SET_PHASE( 0 );
+		PC++;
 	}
 }
 
-void accelerating_driver( DIRECTION_TYPE direction )
-{
-	static bit step;
-	if( direction == POS )
-	{
-		moto_phase[ step ] = POS_ROTATE( moto_phase[ step ] );
-	}
-	else
-	{
-		moto_phase[ step ] = NEG_ROTATE( moto_phase[ step ] );
-	}
-	step = ~step;
-	SET_PHASE( moto_phase[ 0 ] | moto_phase[ 1 ] );
-	SOFT_DELAY( next_delay_times );
-}
+//void accelerating_driver( DIRECTION_TYPE direction )
+//{
+//	static bit step;
+//	if( direction == POS )
+//	{
+//		moto_phase[ step ] = POS_ROTATE( moto_phase[ step ] );
+//	}
+//	else
+//	{
+//		moto_phase[ step ] = NEG_ROTATE( moto_phase[ step ] );
+//	}
+//	step = ~step;
+//	SET_PHASE( moto_phase[ 0 ] | moto_phase[ 1 ] );
+//	SOFT_DELAY( next_delay_times );
+//}
 
-void ANGULAR_ACCELERATING_CHECK( void )
-{
-	static u8 freq;
-	static DIRECTION_TYPE last_direction;
-	SCAN_SWITCH();
-	while( PUBLIC_DIRECTION != NON )
-	{
-		SCAN_SWITCH();
-		if( last_direction != PUBLIC_DIRECTION )
-		{
-			moto_phase[ 1 ] = moto_phase[ 0 ];
-			freq = DELAY_FREQ_INITIAL_VALUE;
-			last_direction = PUBLIC_DIRECTION;
-		}
-		accelerating_driver( PUBLIC_DIRECTION );
-		if( ACCELERAT_PERIOD < ACCELERATION_DELAY )
-		{
-			ACCELERATION_DELAY = 0;
-			next_delay_times = ANTI_JAGGIES / freq;
-			if( ACCELERATION_MAX_FREQ < freq++ )
-				freq = ACCELERATION_MAX_FREQ;
-		}
-	}
-}
+//void ANGULAR_ACCELERATING_CHECK( void )
+//{
+//	static u8 freq;
+//	static DIRECTION_TYPE last_direction;
+//	SCAN_SWITCH();
+//	while( PUBLIC_DIRECTION != NON )
+//	{
+//		SCAN_SWITCH();
+//		if( last_direction != PUBLIC_DIRECTION )
+//		{
+//			moto_phase[ 1 ] = moto_phase[ 0 ];
+//			freq = DELAY_FREQ_INITIAL_VALUE;
+//			last_direction = PUBLIC_DIRECTION;
+//		}
+//		accelerating_driver( PUBLIC_DIRECTION );
+//		if( ACCELERAT_PERIOD < ACCELERATION_DELAY )
+//		{
+//			ACCELERATION_DELAY = 0;
+//			next_delay_times = ANTI_JAGGIES / freq;
+//			if( ACCELERATION_MAX_FREQ < freq++ )
+//				freq = ACCELERATION_MAX_FREQ;
+//		}
+//	}
+//}
 
 
 

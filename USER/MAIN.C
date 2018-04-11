@@ -11,9 +11,16 @@ void main( void )
 {
     USER_SYS_INIT();
 	while( 1 )
-	{
-        ONE_PULSE_DRIVING_CHECK();
-		ANGULAR_ACCELERATING_CHECK();
+	{	
+		extern u16 PC;
+		extern bit dir;
+		PC = 0;
+		while( switch_pin == SET_MARK );
+		dir = ~dir;
+		while( PC != 2048 )
+		{
+			ONE_PULSE_DRIVING_CHECK();
+		}
 	}
 }
 		

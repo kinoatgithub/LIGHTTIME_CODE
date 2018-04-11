@@ -117,7 +117,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>DLGDP51</Key>
-          <Name>(98=937,282,1280,576,1)(82=-1,-1,-1,-1,0)(83=-1,-1,-1,-1,0)(84=-1,-1,-1,-1,0)(85=1072,574,1280,689,1)(99=-1,-1,-1,-1,0)(91=1070,302,1280,577,1)(92=-1,-1,-1,-1,0)(5067=180,121,412,462,0)</Name>
+          <Name>(98=937,282,1280,576,0)(82=-1,-1,-1,-1,0)(83=-1,-1,-1,-1,0)(84=-1,-1,-1,-1,0)(85=311,650,519,765,1)(99=-1,-1,-1,-1,0)(91=750,369,960,644,0)(92=-1,-1,-1,-1,0)(5067=180,121,412,462,0)</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
       <Breakpoint/>
@@ -146,6 +146,11 @@
           <count>4</count>
           <WinNumber>1</WinNumber>
           <ItemText>ONE_PULSE_DELAY</ItemText>
+        </Ww>
+        <Ww>
+          <count>5</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>ONE_PULSE_TIMESUP_FLAG</ItemText>
         </Ww>
       </WatchWindow1>
       <Tracepoint>

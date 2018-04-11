@@ -1,6 +1,8 @@
 #include "TIME_COUNTING.H"
 #include "MOTO_DRIVER.H"
 
+#include "switch.h"			//debug@kino
+
 #define T0_reload_value		( 0x10000 - CLOCK_DIVISION )
 #define	T0H_reload_value	( T0_reload_value >> 8 )
 #define T0L_reload_value	( T0_reload_value & 0x00FF )
@@ -15,6 +17,7 @@ void T0_DIVIER( void ) interrupt 1
 	SWITCH_SCAN_DELAY++;
 	ACCELERATION_DELAY++;
 	ONE_PULSE_DELAY++;
+//	switch_pin = ~switch_pin;			//debug@kino
 	if( ONE_PULSE_PERIOD <= ONE_PULSE_DELAY )
 	{
 		ONE_PULSE_TIMESUP_FLAG = SET_MARK;
